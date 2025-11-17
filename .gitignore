@@ -1,0 +1,61 @@
+# Python
+*.pyc
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+*.egg
+*.egg-info/
+dist/
+build/
+
+# Django
+*.log
+db.sqlite3
+db.sqlite3-journal
+media/
+staticfiles/
+local_settings.py
+
+# 環境変数ファイル
+.env
+.env.*
+!.env.example
+
+# シークレットフォルダ全体を除外
+secrets/
+!secrets/.gitkeep
+
+# 開発環境フラグ
+.is_debug
+
+# 仮想環境
+venv/
+env/
+ENV/
+.venv/
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# OS
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
+
+# テスト
+.coverage
+htmlcov/
+.pytest_cache/
+
+# その他
+*.bak
+*.tmp

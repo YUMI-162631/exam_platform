@@ -1,0 +1,55 @@
+{% extends 'exam/base.html' %}
+
+{% block title %}トップページ - 模擬試験プラットフォーム{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-md-8 mx-auto">
+        <h2 class="mb-4">試験を選択してください</h2>
+        
+        {% if exam_sets %}
+            <div class="row">
+                {% for exam_set in exam_sets %}
+                <div class="col-md-6 mb-4">
+                    <div class="card h-100">
+                        <div class="card-body">
+                            <h5 class="card-title">{{ exam_set.name }}</h5>
+                            <p class="card-text">{{ exam_set.description }}</p>
+                            <p class="text-muted">
+                                <small>問題数: {{ exam_set.total_questions }}問</small>
+                            </p>
+                        </div>
+                        <div class="card-footer bg-white border-0">
+                            <a href="{% url 'start_exam' exam_set.id %}" 
+                               class="btn btn-primary w-100">
+                                試験を開始する
+                            </a>
+                        </div>
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+        {% else %}
+            <div class="alert alert-info">
+                現在、利用可能な試験がありません。
+            </div>
+        {% endif %}
+    </div>
+</div>
+
+<div class="row mt-5">
+    <div class="col-md-8 mx-auto">
+        <div class="card bg-light">
+            <div class="card-body">
+                <h5 class="card-title">使い方</h5>
+                <ol>
+                    <li>受けたい試験を選択して「試験を開始する」をクリック</li>
+                    <li>ランダムに出題される問題に順番に回答</li>
+                    <li>各問題の解答後、正解・不正解と詳しい解説が表示されます</li>
+                    <li>全問題終了後、総合結果が表示されます</li>
+                </ol>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

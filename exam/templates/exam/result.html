@@ -1,0 +1,69 @@
+{% extends 'exam/base.html' %}
+
+{% block title %}試験結果{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-md-8 mx-auto">
+        <div class="card">
+            <div class="card-header bg-primary text-white">
+                <h4 class="mb-0">🎉 試験終了</h4>
+            </div>
+            <div class="card-body text-center">
+                <h2 class="mb-4">{{ session.exam_set.name }}</h2>
+                
+                <div class="row mb-4">
+                    <div class="col-md-6">
+                        <div class="card bg-light">
+                            <div class="card-body">
+                                <h5 class="card-title">正解数</h5>
+                                <h1 class="display-4">{{ score }} / {{ total }}</h1>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="card bg-light">
+                            <div class="card-body">
+                                <h5 class="card-title">正解率</h5>
+                                <h1 class="display-4">{{ percentage }}%</h1>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                {% if percentage >= 80 %}
+                <div class="alert alert-success">
+                    <h5>🎊 素晴らしい！</h5>
+                    <p>高得点です。この調子で頑張りましょう！</p>
+                </div>
+                {% elif percentage >= 60 %}
+                <div class="alert alert-info">
+                    <h5>👍 よくできました！</h5>
+                    <p>合格ラインです。さらに理解を深めましょう。</p>
+                </div>
+                {% else %}
+                <div class="alert alert-warning">
+                    <h5>📚 もう一息！</h5>
+                    <p>復習して、もう一度チャレンジしてみましょう。</p>
+                </div>
+                {% endif %}
+
+                <div class="d-grid gap-2">
+                    <a href="{% url 'start_exam' session.exam_set.id %}" class="btn btn-primary btn-lg">
+                        この試験をもう一度受ける
+                    </a>
+                    <a href="{% url 'top' %}" class="btn btn-outline-secondary btn-lg">
+                        トップページに戻る
+                    </a>
+                </div>
+
+                <div class="mt-4">
+                    <small class="text-muted">
+                        受験日時: {{ session.completed_at|date:"Y年m月d日 H:i" }}
+                    </small>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
