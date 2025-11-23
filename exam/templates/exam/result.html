@@ -1,13 +1,14 @@
 {% extends 'exam/base.html' %}
 
-{% block title %}試験結果{% endblock %}
+{% block title %}採点結果 - {{ session.exam_set.name }}{% endblock %}
 
 {% block content %}
 <div class="row">
-    <div class="col-md-8 mx-auto">
-        <div class="card">
+    <div class="col-md-10 mx-auto">
+        <!-- 総合結果 -->
+        <div class="card mb-4">
             <div class="card-header bg-primary text-white">
-                <h4 class="mb-0">🎉 試験終了</h4>
+                <h4 class="mb-0">🎉 試験終了 - 総合結果</h4>
             </div>
             <div class="card-body text-center">
                 <h2 class="mb-4">{{ session.exam_set.name }}</h2>
@@ -48,19 +49,89 @@
                 </div>
                 {% endif %}
 
-                <div class="d-grid gap-2">
-                    <a href="{% url 'start_exam' session.exam_set.id %}" class="btn btn-primary btn-lg">
-                        この試験をもう一度受ける
-                    </a>
-                    <a href="{% url 'top' %}" class="btn btn-outline-secondary btn-lg">
-                        トップページに戻る
+                <div class="d-grid gap-2 mb-3">
+                    <a href="#answers" class="btn btn-info btn-lg">
+                        📋 解答と解説を見る
                     </a>
                 </div>
+            </div>
+        </div>
 
-                <div class="mt-4">
-                    <small class="text-muted">
-                        受験日時: {{ session.completed_at|date:"Y年m月d日 H:i" }}
-                    </small>
+        <!-- 各問題の解答結果 -->
+        <div id="answers">
+            <h4 class="mb-3">📝 全問題の解答と解説</h4>
+            
+            {% for result in results %}
+            <div class="card mb-4">
+                <div class="card-header {% if result.answer.is_correct %}bg-success{% else %}bg-danger{% endif %} text-white">
+                    <h5 class="mb-0">
+                        問題 {{ result.number }}
+                        {% if result.answer.is_correct %}
+                        ✓ 正解
+                        {% else %}
+                        ✗ 不正解
+                        {% endif %}
+                    </h5>
+                </div>
+                <div class="card-body">
+                    <!-- 問題文 -->
+                    <div class="mb-3">
+                        <h6>問題文</h6>
+                        <p style="white-space: pre-line;">{{ result.question.question_text }}</p>
+                    </div>
+
+                    <!-- あなたの解答と正解 -->
+                    <div class="alert alert-info mb-3">
+                        <strong>あなたの解答:</strong> {{ result.answer.user_answer }}<br>
+                        <strong>正解:</strong> {{ result.question.correct_answer }}
+                    </div>
+
+                    <!-- 解説 -->
+                    <div class="mb-3">
+                        <h6>解説</h6>
+                        <div class="alert alert-light">
+                            <p style="white-space: pre-line;">{{ result.question.explanation }}</p>
+                        </div>
+                    </div>
+
+                    <!-- 各選択肢の説明 -->
+                    <div>
+                        <h6>各選択肢の説明</h6>
+                        {% for number, choice, explanation in result.choices_with_explanations %}
+                        <div class="card mb-2 {% if number == result.question.correct_answer %}border-success border-2{% endif %}">
+                            <div class="card-body">
+                                <h6 class="card-title">
+                                    {{ number }}. {{ choice }}
+                                    {% if number == result.question.correct_answer %}
+                                    <span class="badge bg-success">正解</span>
+                                    {% endif %}
+                                    {% if number == result.answer.user_answer and not result.answer.is_correct %}
+                                    <span class="badge bg-danger">あなたの解答</span>
+                                    {% endif %}
+                                </h6>
+                                <p class="card-text mb-0" style="white-space: pre-line;">{{ explanation }}</p>
+                            </div>
+                        </div>
+                        {% endfor %}
+                    </div>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+
+        <!-- アクションボタン -->
+        <div class="card mb-5">
+            <div class="card-body">
+                <div class="d-grid gap-2">
+                    <a href="{% url 'start_exam' session.exam_set.id %}" class="btn btn-primary btn-lg">
+                        🔄 この試験をもう一度受ける
+                    </a>
+                    <a href="{% url 'top' %}" class="btn btn-outline-secondary btn-lg">
+                        🏠 トップページに戻る
+                    </a>
+                    <a href="#" onclick="window.scrollTo({top: 0, behavior: 'smooth'}); return false;" class="btn btn-outline-info">
+                        ⬆️ ページトップへ
+                    </a>
                 </div>
             </div>
         </div>

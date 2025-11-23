@@ -35,9 +35,15 @@
                     </div>
 
                     <div class="d-grid">
-                        <button type="submit" class="btn btn-primary btn-lg">
-                            解答する
+                        {% if current_number == total_questions %}
+                        <button type="submit" class="btn btn-success btn-lg">
+                            📊 解答して結果を見る
                         </button>
+                        {% else %}
+                        <button type="submit" class="btn btn-primary btn-lg">
+                            次の問題へ →
+                        </button>
+                        {% endif %}
                     </div>
                 </form>
             </div>

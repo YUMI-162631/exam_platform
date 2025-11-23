@@ -8,7 +8,6 @@ import random
 from .models import User, ExamSet, Question, ExamSession, Answer
 from .forms import UserRegistrationForm, LoginForm
 
-# egister（ユーザー登録）
 def register(request):
     """ユーザー登録"""
     if request.method == 'POST':
@@ -24,7 +23,6 @@ def register(request):
         form = UserRegistrationForm()
     return render(request, 'exam/register.html', {'form': form})
 
-# login_view（ログイン）
 def login_view(request):
     """ログイン"""
     if request.method == 'POST':
@@ -32,7 +30,6 @@ def login_view(request):
         if form.is_valid():
             email = form.cleaned_data['email']
             password = form.cleaned_data['password']
-            # メールアドレスでユーザーを検索
             try:
                 user = User.objects.get(email=email)
                 user = authenticate(request, username=user.username, password=password)
@@ -47,7 +44,6 @@ def login_view(request):
         form = LoginForm()
     return render(request, 'exam/login.html', {'form': form})
 
-#user_logout（ログアウト）
 @login_required
 def user_logout(request):
     """ログアウト"""
@@ -55,14 +51,12 @@ def user_logout(request):
     messages.success(request, 'ログアウトしました。')
     return redirect('login')
 
-# top（トップページ）
 @login_required
 def top(request):
     """トップページ - 試験選択"""
     exam_sets = ExamSet.objects.all()
     return render(request, 'exam/top.html', {'exam_sets': exam_sets})
 
-# start_exam（試験開始）
 @login_required
 def start_exam(request, exam_set_id):
     """試験開始"""
@@ -92,10 +86,9 @@ def start_exam(request, exam_set_id):
     
     return redirect('show_question')
 
-# show_question（問題表示）
 @login_required
 def show_question(request):
-    """問題表示"""
+    """問題を1問ずつ表示"""
     session_id = request.session.get('current_exam_session_id')
     question_ids = request.session.get('question_ids', [])
     current_index = request.session.get('current_question_index', 0)
@@ -120,10 +113,9 @@ def show_question(request):
     
     return render(request, 'exam/question.html', context)
 
-# submit_answer（解答送信）
 @login_required
 def submit_answer(request):
-    """解答送信"""
+    """解答を送信して次の問題へ"""
     if request.method != 'POST':
         return redirect('top')
     
@@ -146,57 +138,11 @@ def submit_answer(request):
         is_correct=is_correct
     )
     
-    return redirect('show_answer_result', question_id=question.id)
-
-# show_answer_result（解答結果表示）
-@login_required
-def show_answer_result(request, question_id):
-    """解答結果表示"""
-    session_id = request.session.get('current_exam_session_id')
-    current_index = request.session.get('current_question_index', 0)
-    question_ids = request.session.get('question_ids', [])
-    
-    session = get_object_or_404(ExamSession, id=session_id)
-    question = get_object_or_404(Question, id=question_id)
-    answer = Answer.objects.get(
-        session=session,
-        question=question,
-        question_order=current_index + 1
-    )
-    
-    choices_with_explanations = [
-        (i, choice, explanation)
-        for i, (choice, explanation) in enumerate(
-            zip(question.get_choices(), question.get_explanations()),
-            start=1
-        )
-    ]
-    
-    context = {
-        'question': question,
-        'answer': answer,
-        'current_number': current_index + 1,
-        'total_questions': len(question_ids),
-        'choices_with_explanations': choices_with_explanations,
-        'is_last_question': current_index >= len(question_ids) - 1
-    }
-    
-    return render(request, 'exam/answer_result.html', context)
-
-# next_question（次の問題へ）
-@login_required
-def next_question(request):
-    """次の問題へ"""
-    current_index = request.session.get('current_question_index', 0)
-    question_ids = request.session.get('question_ids', [])
-    
+    # 次の問題へ
     request.session['current_question_index'] = current_index + 1
     
+    # 最後の問題なら結果画面へ
     if current_index + 1 >= len(question_ids):
-        # 全問題終了
-        session_id = request.session.get('current_exam_session_id')
-        session = get_object_or_404(ExamSession, id=session_id)
-        
         # スコア計算
         session.score = session.calculate_score()
         session.completed_at = timezone.now()
@@ -205,24 +151,43 @@ def next_question(request):
         
         return redirect('exam_result', session_id=session_id)
     
+    # まだ問題があれば次の問題へ
     return redirect('show_question')
 
-# exam_result（試験結果表示）
 @login_required
 def exam_result(request, session_id):
-    """試験結果表示"""
+    """採点結果表示（40問分の解答を一覧表示）"""
     session = get_object_or_404(ExamSession, id=session_id, user=request.user)
+    
+    # 解答一覧を取得（問題順に並べる）
+    answers = session.answers.all().order_by('question_order')
+    
+    # 各解答に問題情報と選択肢を追加
+    results = []
+    for answer in answers:
+        question = answer.question
+        results.append({
+            'number': answer.question_order,
+            'question': question,
+            'answer': answer,
+            'choices_with_explanations': [
+                (i, choice, explanation)
+                for i, (choice, explanation) in enumerate(
+                    zip(question.get_choices(), question.get_explanations()),
+                    start=1
+                )
+            ]
+        })
     
     # セッションデータをクリア
     if 'current_exam_session_id' in request.session:
         del request.session['current_exam_session_id']
     if 'question_ids' in request.session:
         del request.session['question_ids']
-    if 'current_question_index' in request.session:
-        del request.session['current_question_index']
     
     context = {
         'session': session,
+        'results': results,
         'score': session.score,
         'total': session.total_questions,
         'percentage': session.get_percentage()
