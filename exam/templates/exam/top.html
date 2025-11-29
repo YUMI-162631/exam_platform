@@ -7,6 +7,48 @@
     <div class="col-md-8 mx-auto">
         <h2 class="mb-4">試験を選択してください</h2>
         
+        <!-- 中断中の試験があれば表示 -->
+        {% if incomplete_sessions %}
+        <div class="alert alert-warning" role="alert">
+            <h5 class="alert-heading">⏸ 中断中の試験があります</h5>
+            <p>以下の試験を中断しました。続きから再開できます。</p>
+            <hr>
+            {% for session in incomplete_sessions %}
+            <div class="card mb-3">
+                <div class="card-body">
+                    <div class="row align-items-center">
+                        <div class="col-md-7">
+                            <h6 class="mb-1">{{ session.exam_set.name }}</h6>
+                            <small class="text-muted d-block">
+                                開始: {{ session.started_at|date:"Y年m月d日 H:i" }}
+                            </small>
+                            <small class="text-success d-block mt-1">
+                                 {{ session.answers.count }} / {{ session.total_questions }} 問解答済み
+                            </small>
+                            <div class="progress mt-2" style="height: 8px;">
+                                <div class="progress-bar bg-success" 
+                                     role="progressbar" 
+                                     style="width: {% widthratio session.answers.count session.total_questions 100 %}%;">
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-5 text-md-end mt-2 mt-md-0">
+                            <a href="{% url 'resume_exam' session.id %}" class="btn btn-primary btn-sm me-2">
+                                ▶ 再開する
+                            </a>
+                            <a href="{% url 'delete_session' session.id %}" 
+                               class="btn btn-outline-danger btn-sm"
+                               onclick="return confirm('この試験を削除しますか？\n解答したデータも削除されます。')">
+                                削除
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+        {% endif %}
+        
         {% if exam_sets %}
             <div class="row">
                 {% for exam_set in exam_sets %}
@@ -47,9 +89,12 @@
                     <li>ランダムに出題される問題に順番に回答</li>
                     <li>各問題の解答後、正解・不正解と詳しい解説が表示されます</li>
                     <li>全問題終了後、総合結果が表示されます</li>
+                    <li><strong>※ 途中で中断したい場合は、画面右上の「中断」ボタンをクリック</strong></li>
                 </ol>
             </div>
         </div>
     </div>
 </div>
 {% endblock %}
+
+

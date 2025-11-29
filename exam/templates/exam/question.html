@@ -7,7 +7,12 @@
     <div class="col-md-10 mx-auto">
         <div class="card">
             <div class="card-header bg-primary text-white">
-                <h5 class="mb-0">問題 {{ current_number }} / {{ total_questions }}</h5>
+                <div class="d-flex justify-content-between align-items-center">
+                    <h5 class="mb-0">問題 {{ current_number }} / {{ total_questions }}</h5>
+                    <a href="{% url 'cancel_exam' %}" class="btn btn-sm btn-outline-light">
+                        ⏸️ 中断
+                    </a>
+                </div>
             </div>
             <div class="card-body">
                 <div class="mb-4">
@@ -26,6 +31,7 @@
                                    name="answer" 
                                    id="choice{{ number }}" 
                                    value="{{ number }}"
+                                   {% if previous_answer == number %}checked{% endif %}
                                    required>
                             <label class="form-check-label" for="choice{{ number }}">
                                 <strong>{{ number }}.</strong> {{ choice }}
@@ -34,16 +40,32 @@
                         {% endfor %}
                     </div>
 
-                    <div class="d-grid">
-                        {% if current_number == total_questions %}
-                        <button type="submit" class="btn btn-success btn-lg">
-                            📊 解答して結果を見る
-                        </button>
-                        {% else %}
-                        <button type="submit" class="btn btn-primary btn-lg">
-                            次の問題へ →
-                        </button>
-                        {% endif %}
+                    <div class="row g-2">
+                        <!-- 戻るボタン -->
+                        <div class="col-md-6">
+                            {% if not is_first_question %}
+                            <a href="{% url 'previous_question' %}" class="btn btn-outline-secondary btn-lg w-100">
+                                ← 前の問題へ戻る
+                            </a>
+                            {% else %}
+                            <a href="{% url 'cancel_exam' %}" class="btn btn-outline-warning btn-lg w-100">
+                                ⏸️ 試験を中断
+                            </a>
+                            {% endif %}
+                        </div>
+                        
+                        <!-- 次へボタン -->
+                        <div class="col-md-6">
+                            {% if current_number == total_questions %}
+                            <button type="submit" class="btn btn-success btn-lg w-100">
+                                解答して結果を見る
+                            </button>
+                            {% else %}
+                            <button type="submit" class="btn btn-primary btn-lg w-100">
+                                次の問題へ →
+                            </button>
+                            {% endif %}
+                        </div>
                     </div>
                 </form>
             </div>

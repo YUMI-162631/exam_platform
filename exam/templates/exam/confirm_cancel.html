@@ -1,0 +1,64 @@
+{% extends 'exam/base.html' %}
+
+{% block title %}試験の中断{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-md-6 mx-auto">
+        <div class="card border-warning">
+            <div class="card-header bg-warning text-dark">
+                <h5 class="mb-0">⏸️ 試験を中断しますか？</h5>
+            </div>
+            <div class="card-body">
+                <h6 class="mb-3">{{ session.exam_set.name }}</h6>
+                
+                <div class="alert alert-info">
+                    <p class="mb-2">
+                        <strong>現在の進捗状況</strong>
+                    </p>
+                    <p class="mb-0">
+                        解答済み: {{ answered_count }} / {{ total_questions }} 問<br>
+                        現在: {{ current_number }} 問目
+                    </p>
+                    <div class="progress mt-2" style="height: 10px;">
+                        <div class="progress-bar bg-success" 
+                             role="progressbar" 
+                             style="width: {% widthratio answered_count total_questions 100 %}%;">
+                        </div>
+                    </div>
+                </div>
+
+                <p class="mb-4">どうしますか？</p>
+
+                <form method="post">
+                    {% csrf_token %}
+                    
+                    <!-- 途中で終了して採点ボタン -->
+                    <button type="submit" name="action" value="finish" 
+                            class="btn w-100 mb-3 text-white"
+                            style="background-color: #9ea5ac;"
+                            onclick="return confirm('この試験を終了して採点しますか？\n解答済みの{{ answered_count }}問のみ採点されます。')">
+                        ここで終了して採点する
+                        <small class="d-block text-white mt-1" style="opacity: 0.9;">
+                            解答済みの{{ answered_count }}問を採点します
+                        </small>
+                    </button>
+
+                    <!-- 中断して後で再開ボタン -->
+                    <button type="submit" name="action" value="pause" class="btn btn-warning w-100 mb-3">
+                        ⏸️ 中断して後で再開する
+                        <small class="d-block text-dark mt-1" style="opacity: 0.8;">
+                            進捗は保存され、続きから再開できます
+                        </small>
+                    </button>
+
+                    <!-- キャンセルボタン -->
+                    <button type="submit" name="action" value="cancel" class="btn btn-outline-secondary w-100">
+                        ← 試験に戻る
+                    </button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

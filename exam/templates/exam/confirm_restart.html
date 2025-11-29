@@ -1,0 +1,62 @@
+{% extends 'exam/base.html' %}
+
+{% block title %}試験開始の確認{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-md-6 mx-auto">
+        <div class="card border-warning">
+            <div class="card-header bg-warning text-dark">
+                <h5 class="mb-0">⚠️ 中断中の試験があります</h5>
+            </div>
+            <div class="card-body">
+                <h6 class="mb-3">{{ exam_set.name }}</h6>
+                
+                <div class="alert alert-info">
+                    <p class="mb-2">
+                        <strong>この試験はすでに開始されています</strong>
+                    </p>
+                    <p class="mb-0">
+                        解答済み: {{ answered_count }} / {{ incomplete_session.total_questions }} 問
+                    </p>
+                    <div class="progress mt-2" style="height: 10px;">
+                        <div class="progress-bar bg-success" 
+                             role="progressbar" 
+                             style="width: {% widthratio answered_count incomplete_session.total_questions 100 %}%;">
+                        </div>
+                    </div>
+                </div>
+
+                <p class="mb-4">どうしますか？</p>
+
+                <form method="post">
+                    {% csrf_token %}
+                    
+                    <!-- 再開ボタン -->
+                    <button type="submit" name="action" value="resume" class="btn btn-primary w-100 mb-3">
+                        ▶️ 中断した試験を再開する
+                        <small class="d-block text-white-50 mt-1">
+                            {{ answered_count }}問目の続きから開始します
+                        </small>
+                    </button>
+
+                    <!-- 最初からやり直しボタン -->
+                    <button type="submit" name="action" value="restart" 
+                            class="btn btn-warning w-100 mb-3"
+                            onclick="return confirm('本当に最初からやり直しますか？\n現在の解答データは削除されます。')">
+                        🔄 最初からやり直す
+                        <small class="d-block text-dark mt-1" style="opacity: 0.8;">
+                            現在の進捗は削除されます
+                        </small>
+                    </button>
+
+                    <!-- キャンセルボタン -->
+                    <button type="submit" name="action" value="cancel" class="btn btn-outline-secondary w-100">
+                        ← トップページに戻る
+                    </button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

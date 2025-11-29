@@ -8,7 +8,7 @@
         <!-- 総合結果 -->
         <div class="card mb-4">
             <div class="card-header bg-primary text-white">
-                <h4 class="mb-0">🎉 試験終了 - 総合結果</h4>
+                <h4 class="mb-0">試験終了 - 総合結果</h4>
             </div>
             <div class="card-body text-center">
                 <h2 class="mb-4">{{ session.exam_set.name }}</h2>
@@ -34,24 +34,24 @@
 
                 {% if percentage >= 80 %}
                 <div class="alert alert-success">
-                    <h5>🎊 素晴らしい！</h5>
+                    <h5>素晴らしい！</h5>
                     <p>高得点です。この調子で頑張りましょう！</p>
                 </div>
-                {% elif percentage >= 60 %}
+                {% elif percentage >= 70 %}
                 <div class="alert alert-info">
-                    <h5>👍 よくできました！</h5>
+                    <h5>よくできました！</h5>
                     <p>合格ラインです。さらに理解を深めましょう。</p>
                 </div>
                 {% else %}
                 <div class="alert alert-warning">
-                    <h5>📚 もう一息！</h5>
+                    <h5>もう一息！</h5>
                     <p>復習して、もう一度チャレンジしてみましょう。</p>
                 </div>
                 {% endif %}
 
                 <div class="d-grid gap-2 mb-3">
                     <a href="#answers" class="btn btn-info btn-lg">
-                        📋 解答と解説を見る
+                        解答と解説を見る
                     </a>
                 </div>
             </div>
@@ -59,7 +59,7 @@
 
         <!-- 各問題の解答結果 -->
         <div id="answers">
-            <h4 class="mb-3">📝 全問題の解答と解説</h4>
+            <h4 class="mb-3">全問題の解答と解説</h4>
             
             {% for result in results %}
             <div class="card mb-4">
@@ -124,13 +124,13 @@
             <div class="card-body">
                 <div class="d-grid gap-2">
                     <a href="{% url 'start_exam' session.exam_set.id %}" class="btn btn-primary btn-lg">
-                        🔄 この試験をもう一度受ける
+                        この試験をもう一度受ける
                     </a>
                     <a href="{% url 'top' %}" class="btn btn-outline-secondary btn-lg">
-                        🏠 トップページに戻る
+                        トップページに戻る
                     </a>
                     <a href="#" onclick="window.scrollTo({top: 0, behavior: 'smooth'}); return false;" class="btn btn-outline-info">
-                        ⬆️ ページトップへ
+                        ⬆ 先頭に戻る
                     </a>
                 </div>
             </div>
