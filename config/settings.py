@@ -16,11 +16,11 @@ root = environ.Path(BASE_DIR / 'secrets')
 if os.path.exists(BASE_DIR / ".is_debug"):
     # 開発環境
     env.read_env(root(".env.dev"))
-    print("🔧 開発環境で起動します")
+    print("開発環境で起動します")
 else:
     # 本番環境
     env.read_env(root(".env.prod"))
-    print("🚀 本番環境で起動します")
+    print("本番環境で起動します")
 
 # セキュリティ設定
 SECRET_KEY = env.str('SECRET_KEY')
@@ -137,7 +137,8 @@ import dj_database_url
 # Heroku環境の判定（DATABASE_URLが設定されている場合）
 if 'DATABASE_URL' in os.environ:
     # WhiteNoiseミドルウェアを追加（静的ファイル配信用）
-    MIDDLEWARE.insert(1, 'whitenoise.middleware.WhiteNoiseMiddleware')
+    if 'whitenoise.middleware.WhiteNoiseMiddleware' not in MIDDLEWARE:
+        MIDDLEWARE.insert(1, 'whitenoise.middleware.WhiteNoiseMiddleware')
     STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
     
     # データベース設定（Heroku PostgreSQL）
