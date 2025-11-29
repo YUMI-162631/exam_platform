@@ -1,42 +1,29 @@
-"""
-Django settings for config project.
-"""
+# ========================================
+# Heroku用設定
+# ========================================
+import dj_database_url
 
-import os
-from pathlib import Path
-import environ
-
-# Build paths inside the project like this: BASE_DIR / 'subdir'.
-BASE_DIR = Path(__file__).resolve().parent.parent
-
-# 環境変数の読み込み
-env = environ.Env()
-root = environ.Path(BASE_DIR / 'secrets')
-
-if os.path.exists(BASE_DIR / ".is_debug"):
-    # 開発環境
-    env.read_env(root(".env.dev"))
-    print("🔧 開発環境で起動します")
-else:
-    # 本番環境
-    env.read_env(root(".env.prod"))
-    print("🚀 本番環境で起動します")
-
-# セキュリティ設定
-SECRET_KEY = env.str('SECRET_KEY')
-DEBUG = env.bool('DEBUG')
-ALLOWED_HOSTS = env.list('ALLOWED_HOSTS')
-
-# インストール済みアプリ
-INSTALLED_APPS = [
-    'django.contrib.admin',
-    'django.contrib.auth',
-    'django.contrib.contenttypes',
-    'django.contrib.sessions',
-    'django.contrib.messages',
-    'django.contrib.staticfiles',
-    'exam',  # 自作アプリ
-]
+# Heroku環境の判定（DATABASE_URLが設定されている場合）
+if os.environ.get('DATABASE_URL'):
+    # WhiteNoiseミドルウェアを追加（静的ファイル配信用）
+    MIDDLEWARE.insert(1, 'whitenoise.middleware.WhiteNoiseMiddleware')
+    STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
+    
+    # データベース設定（Heroku PostgreSQL）
+    DATABASES['default'] = dj_database_url.config(
+        conn_max_age=600,
+        ssl_require=True
+    )
+    
+    # Heroku環境変数から設定を読み込む
+    SECRET_KEY = os.environ.get('SECRET_KEY')
+    DEBUG = os.environ.get('DEBUG', 'False') == 'True'
+    ALLOWED_HOSTS = os.environ.get('ALLOWED_HOSTS', '').split(',')
+    
+    # セキュリティ設定強化
+    SECURE_HSTS_SECONDS = 31536000
+    SECURE_HSTS_INCLUDE_SUBDOMAINS = True
+    SECURE_HSTS_PRELOAD = True
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
