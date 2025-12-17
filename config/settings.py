@@ -68,6 +68,7 @@ TEMPLATES = [
 
 WSGI_APPLICATION = 'config.wsgi.application'
 
+"""
 # データベース設定
 if env.str('DATABASE_URL', default=''):
     # 本番環境（PostgreSQL）
@@ -82,6 +83,7 @@ else:
             'NAME': BASE_DIR / 'db.sqlite3',
         }
     }
+"""
 
 # Password validation
 AUTH_PASSWORD_VALIDATORS = [
